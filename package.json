@@ -1,6 +1,6 @@
 {
-  "name": "javascript-action",
-  "version": "1.0.0",
+  "name": "semantic-release-pr-label-action",
+  "version": "0.0.1",
   "description": "JavaScript Action Template",
   "main": "index.js",
   "scripts": {
@@ -10,25 +10,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/JaredReisinger/semantic-release-pr-label-action.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "JavaScript",
+    "semantic-release",
+    "ci",
+    "cd",
+    "ci/cd"
   ],
   "author": "GitHub",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/JaredReisinger/semantic-release-pr-label-action/issues"
   },
-  "homepage": "https://github.com/actions/javascript-action#readme",
-  "dependencies": {
-    "@actions/core": "^1.1.1"
-  },
+  "homepage": "https://github.com/JaredReisinger/semantic-release-pr-label-action#readme",
   "devDependencies": {
-    "@zeit/ncc": "^0.20.5",
-    "eslint": "^6.3.0",
-    "jest": "^24.9.0"
+    "@actions/core": "^1.2.2",
+    "@actions/github": "^2.1.0",
+    "@zeit/ncc": "^0.21.0",
+    "eslint": "^6.8.0",
+    "jest": "^25.1.0",
+    "semantic-release": "17.0.1"
   }
 }

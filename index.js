@@ -1,22 +1,24 @@
 const core = require('@actions/core');
-const wait = require('./wait');
-
+const impl = require('./impl');
 
 // most @actions toolkit packages have async methods
 async function run() {
-  try { 
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`)
-
-    core.debug((new Date()).toTimeString())
-    wait(parseInt(ms));
-    core.debug((new Date()).toTimeString())
-
-    core.setOutput('time', new Date().toTimeString());
-  } 
-  catch (error) {
+  try {
+    const context = impl.getContext();
+    // core.debug(JSON.stringify(context));
+    // console.dir({ context });
+    const commits = await impl.getCommits(context);
+    // core.debug(JSON.stringify(commits));
+    // console.dir({ commits });
+    const result = impl.analyzeCommits(commits, context);
+    core.debug(`result: ${JSON.stringify(result)}`);
+  } catch(error) {
     core.setFailed(error.message);
   }
 }
 
-run()
+run();
+
+exports = module.exports = {
+  run,
+};

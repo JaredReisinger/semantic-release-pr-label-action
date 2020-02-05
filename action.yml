@@ -1,13 +1,31 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: Label PR Release Impact
+description: Labels a PR based on the semantic-release impact of their commits
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  github-token:
+    description: 'token for GitHub operations, use ${{secrets.GITHUB_TOKEN}}'
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps 
-    description: 'The message to output'
+  patch-label:
+    description: label to apply for a patch release (-.-.x)
+    required: true
+  minor-label:
+    description: label to apply for a minor release (-.x.-)
+    required: true
+  major-label:
+    description: label to apply for a major release (x.-.-)
+    required: true
+  no-label:
+    description: label to apply for no release
+    required: true
+  # milliseconds:  # id of input
+  #   description: number of milliseconds to wait
+  #   required: true
+  #   default: '1000'
+# outputs:
+#   time: # output will be available to future steps
+#     description: 'The message to output'
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node12
+  main: dist/index.js
+branding:
+  icon: tag
+  color: orange
