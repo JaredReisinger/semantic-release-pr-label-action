@@ -12,7 +12,7 @@ async function run() {
     // console.dir({ commits });
     const result = impl.analyzeCommits(commits, context);
     core.debug(`result: ${JSON.stringify(result)}`);
-  } catch(error) {
+  } catch (error) {
     core.setFailed(error.message);
   }
 }

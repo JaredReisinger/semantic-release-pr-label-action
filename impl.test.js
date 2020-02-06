@@ -1,17 +1,17 @@
 // const wait = require('./wait');
 // const process = require("process");
 // const proc = require("child_process");
-const path = require("path");
+const path = require('path');
 
-describe("implementation tests", () => {
-  const mockCore = jest.genMockFromModule("@actions/core");
+describe('implementation tests', () => {
+  const mockCore = jest.genMockFromModule('@actions/core');
 
   const inputs = {
     'github-token': { value: 'TOKEN', required: true },
-  }
-  
+  };
+
   const commits = [{ message: 'BOGUS' }];
-  
+
   mockCore.getInput.mockImplementation((name, options) => {
     expect(Object.keys(inputs)).toContain(name);
 
@@ -23,7 +23,7 @@ describe("implementation tests", () => {
     return value;
   });
 
-  const mockGithub = jest.genMockFromModule("@actions/github");
+  const mockGithub = jest.genMockFromModule('@actions/github');
 
   // add just enough context data for tests...
   mockGithub.context = {
@@ -38,11 +38,11 @@ describe("implementation tests", () => {
           },
         },
         number: 123,
-      }
+      },
     },
   };
 
-  mockGithub.GitHub.mockImplementation((token) => {
+  mockGithub.GitHub.mockImplementation(token => {
     expect(token).toBe(inputs['github-token'].value);
 
     return {
@@ -61,12 +61,11 @@ describe("implementation tests", () => {
     };
   });
 
-
   let impl;
 
   beforeAll(() => {
-    jest.setMock("@actions/core", mockCore);
-    jest.setMock("@actions/github", mockGithub);
+    jest.setMock('@actions/core', mockCore);
+    jest.setMock('@actions/github', mockGithub);
     impl = require(path.join(__dirname, 'impl.js'));
   });
 
@@ -90,5 +89,5 @@ describe("implementation tests", () => {
     const context = impl.getContext();
     const actual = await impl.getCommits(context);
     expect(actual).toEqual(commits);
-  })
+  });
 });
