@@ -2,6 +2,9 @@
 // const process = require("process");
 const proc = require('child_process');
 const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 describe('action tests', () => {
   // shows how the runner will run a javascript action with env / stdout
@@ -26,8 +29,7 @@ describe('action tests', () => {
       GITHUB_SHA: '703be188a57b243ff790f8b9606f3749855e8949',
       GITHUB_WORKFLOW: 'Pull Request',
       GITHUB_WORKSPACE: './__test__',
-      // 'INPUT_GITHUB-TOKEN': 'TOKEN',
-      'INPUT_GITHUB-TOKEN': '97d801b9ef449d86e0ac3cfee52ad8f1bc6f935c',
+      // 'INPUT_GITHUB-TOKEN': 'TOKEN COMES FROM .env FILE or CI PIPELINE!',
       'INPUT_PATCH-LABEL': 'PATCH',
       'INPUT_MINOR-LABEL': 'MINOR',
       'INPUT_MAJOR-LABEL': 'MAJOR',
@@ -46,24 +48,6 @@ describe('action tests', () => {
 
     console.log(`STDOUT:\n${stdout.toString()}\nSTDERR:\n${stderr.toString()}`);
   });
-  //
-  // test('getContext', () => {
-  //   const context = index.getContext();
-  //   expect(context).toMatchObject({
-  //     core: mockCore,
-  //     github: mockGithub,
-  //     octokit: expect.anything(),
-  //     owner: 'OWNER',
-  //     repo: 'REPO',
-  //     pull_number: 123,
-  //   });
-  // });
-  //
-  // test('getCommits', async () => {
-  //   const context = index.getContext();
-  //   const actual = await index.getCommits(context);
-  //   expect(actual).toBe(commits);
-  // })
 });
 
 // The template repo gets the "invoke the app" logic all wrong, and the test

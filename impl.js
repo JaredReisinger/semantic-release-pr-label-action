@@ -10,7 +10,6 @@ function getContext() {
   const pull_number = pull_request.number;
 
   const token = core.getInput('github-token', { required: true });
-
   const octokit = new github.GitHub(token);
 
   return { core, github, octokit, owner, repo, pull_number };
