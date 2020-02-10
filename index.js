@@ -10,7 +10,7 @@ async function run() {
     const commits = await impl.getCommits(context);
     // core.debug(JSON.stringify(commits));
     // console.dir({ commits });
-    const result = impl.analyzeCommits(commits, context);
+    const result = await impl.analyzeCommits(commits, context);
     core.debug(`result: ${JSON.stringify(result)}`);
   } catch (error) {
     core.setFailed(error.message);

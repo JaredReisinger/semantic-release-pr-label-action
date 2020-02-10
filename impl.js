@@ -1,3 +1,6 @@
+const path = require('path');
+const fs = require('fs').promises;
+
 // encapsulates the github/ocktokit initialization to ease testing
 function getContext() {
   const core = require('@actions/core');
@@ -34,10 +37,117 @@ async function getCommits({ core, octokit, owner, repo, pull_number }) {
   return commits;
 }
 
-function analyzeCommits(commits, { core }) {
-  core.debug('analyzeCommits');
-  core.debug(`analyzing ${commits.length} commits...`);
-  return false;
+async function analyzeCommits(commits, { core }) {
+  core.debug(`analyzeCommits (with ${commits.length} commits)`);
+
+  // load semantic-release components *from the calling repository*
+  // may require running npm install?
+  const workspace = path.resolve(process.env.GITHUB_WORKSPACE);
+
+  const { getLogger, getConfig, envCi } = await getSemanticRelease(
+    workspace,
+    core
+  );
+
+  const result = await useSemanticReleaseAnalysis(
+    commits,
+    getLogger,
+    getConfig,
+    envCi
+  );
+  core.debug(`result: ${result}`);
+
+  return result;
+}
+
+// encapsulate the dynamic module loading (should this move into getContext?)
+async function getSemanticRelease(workspace, core) {
+  const getLogger = await requireModule(
+    core,
+    workspace,
+    'node_modules',
+    'semantic-release',
+    'lib',
+    'get-logger'
+  );
+  const getConfig = await requireModule(
+    core,
+    workspace,
+    'node_modules',
+    'semantic-release',
+    'lib',
+    'get-config'
+  );
+  const envCi = await requireModule(core, workspace, 'node_modules', 'env-ci');
+
+  return { getLogger, getConfig, envCi };
+}
+
+async function useSemanticReleaseAnalysis(
+  commits,
+  getLogger,
+  getConfig,
+  envCi
+) {
+  const cwd = process.cwd();
+  const env = process.env;
+
+  const context = {
+    cwd,
+    env,
+    stdout: process.stdout,
+    stdin: process.stdin,
+    envCi: envCi({ env, cwd }),
+  };
+  context.logger = getLogger(context);
+
+  const opts = {};
+
+  // console.log("CONTEXT...");
+  // console.dir({...context, env: '[REDACTED]'});
+
+  context.logger.log("Loading project's semantic-release config...");
+  const { plugins, options } = await getConfig(context, opts);
+  // context.logger.log("Loaded semantic-release config:");
+  // console.dir({ plugins, options });
+
+  context.options = options;
+  context.commits = commits;
+
+  context.logger.log('Analyzing commits...');
+  const result = await plugins.analyzeCommits(context);
+  // core.debug(`result: ${result}`);
+
+  return result;
+}
+
+// attempts to require() a module from the workspace directory, checking each step
+// to help diagnose problems.  The last component is not checked, as it could be
+// a directory (containing index.js) or it might be a JS file itself.
+async function requireModule(core, root, ...paths) {
+  // core.debug(`looking for ${JSON.stringify(paths)} in "${root}"`);
+
+  let checkDir = path.resolve(root);
+
+  const dirs = paths.slice(0, -1);
+  const file = paths.slice(-1)[0];
+
+  for (const dir of dirs) {
+    // core.debug(`looking for "${dir}" in "${checkDir}"`);
+    if (!(await fs.readdir(checkDir)).includes(dir)) {
+      throw new Error(`No "${dir}" found in "${checkDir}".`);
+    }
+    checkDir = path.join(checkDir, dir);
+  }
+
+  // If we got this far, we appear to have semantic-release components available!
+  const component = require(path.join(checkDir, file).toString());
+  // console.dir(component);
+  if (!component) {
+    throw new Error(`Unable to load ${JSON.stringify(paths)} from "${root}".`);
+  }
+
+  return component;
 }
 
 exports = module.exports = {

@@ -28,7 +28,7 @@ describe('action tests', () => {
       // GITHUB_SHA: '50606bf40bf3f94ec1b00a4a5f311e1106259e8e',
       GITHUB_SHA: '703be188a57b243ff790f8b9606f3749855e8949',
       GITHUB_WORKFLOW: 'Pull Request',
-      GITHUB_WORKSPACE: './__test__',
+      GITHUB_WORKSPACE: '.',
       // 'INPUT_GITHUB-TOKEN': 'TOKEN COMES FROM .env FILE or CI PIPELINE!',
       'INPUT_PATCH-LABEL': 'PATCH',
       'INPUT_MINOR-LABEL': 'MINOR',
