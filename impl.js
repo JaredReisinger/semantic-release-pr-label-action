@@ -2,7 +2,8 @@ const path = require('path');
 const fs = require('fs').promises;
 
 // encapsulates the github/ocktokit initialization to ease testing
-function getContext() {
+// NOTE: will also find semantic-release modules?
+async function getContext(workspace) {
   const core = require('@actions/core');
   core.debug('getContext');
   const github = require('@actions/github');
@@ -12,10 +13,52 @@ function getContext() {
   const repo = pull_request.base.repo.name;
   const pull_number = pull_request.number;
 
-  const token = core.getInput('github-token', { required: true });
+  // const token = core.getInput('github-token', { required: true });
+  const { token, labels, dryRun } = getInputs(core);
+
   const octokit = new github.GitHub(token);
 
-  return { core, github, octokit, owner, repo, pull_number };
+  // load semantic-release components *from the calling repository*
+  // may require running npm install?
+  // const workspace = path.resolve(process.env.GITHUB_WORKSPACE);
+  const { getLogger, getConfig, envCi } = await getSemanticReleaseModules(
+    workspace,
+    core
+  );
+
+  return {
+    core,
+    github,
+    octokit,
+    labels,
+    dryRun,
+    owner,
+    repo,
+    pull_number,
+    getLogger,
+    getConfig,
+    envCi,
+  };
+}
+
+function getInputs(core) {
+  const token = core.getInput('github-token', { required: true });
+
+  const patch = core.getInput('patch-label', { required: true });
+  const minor = core.getInput('minor-label', { required: true });
+  const major = core.getInput('major-label', { required: true });
+  const skipped = core.getInput('skipped-label');
+
+  const dryRun = core.getInput('dry-run') || false;
+
+  const labels = {
+    patch,
+    minor,
+    major,
+    skipped,
+  };
+
+  return { token, labels, dryRun };
 }
 
 async function getCommits({ core, octokit, owner, repo, pull_number }) {
@@ -37,17 +80,17 @@ async function getCommits({ core, octokit, owner, repo, pull_number }) {
   return commits;
 }
 
-async function analyzeCommits(commits, { core }) {
+async function analyzeCommits(commits, { core, getLogger, getConfig, envCi }) {
   core.debug(`analyzeCommits (with ${commits.length} commits)`);
 
-  // load semantic-release components *from the calling repository*
-  // may require running npm install?
-  const workspace = path.resolve(process.env.GITHUB_WORKSPACE);
+  // // load semantic-release components *from the calling repository*
+  // // may require running npm install?
+  // const workspace = path.resolve(process.env.GITHUB_WORKSPACE);
 
-  const { getLogger, getConfig, envCi } = await getSemanticRelease(
-    workspace,
-    core
-  );
+  // const { getLogger, getConfig, envCi } = await getSemanticReleaseModules(
+  //   workspace,
+  //   core
+  // );
 
   const result = await useSemanticReleaseAnalysis(
     commits,
@@ -55,13 +98,13 @@ async function analyzeCommits(commits, { core }) {
     getConfig,
     envCi
   );
-  core.debug(`result: ${result}`);
 
+  // core.debug(`result: ${result}`);
   return result;
 }
 
 // encapsulate the dynamic module loading (should this move into getContext?)
-async function getSemanticRelease(workspace, core) {
+async function getSemanticReleaseModules(workspace, core) {
   const getLogger = await requireModule(
     core,
     workspace,
@@ -150,8 +193,68 @@ async function requireModule(core, root, ...paths) {
   return component;
 }
 
+function labelFromAnalysis(result, { core, labels }) {
+  core.debug(`labelFromAnalysis(${JSON.stringify(result)})`);
+  core.debug(`looking in ${JSON.stringify(labels)}`);
+  let label = labels[result] || labels['skipped'] || null;
+  core.debug(`found label ${JSON.stringify(label)}`);
+  return label;
+}
+
+async function addLabel(
+  label,
+  { core, octokit, labels, dryRun, owner, repo, pull_number }
+) {
+  const knownLabels = Object.values(labels);
+  core.debug(`adding label "${label}" (from ${JSON.stringify(knownLabels)})`);
+  // const result = await octokit.issues.listLabelsOnIssue({
+  //   owner,
+  //   repo,
+  //   issue_number: pull_number,
+  //   per_page: 100,
+  // });
+  // core.debug(`got labels: ${JSON.stringify(result.data.map(l => l.name))}`);
+
+  // remove all the release labels, ignoring any 404 errors, and then add the
+  // correct one.  (perhaps not as efficient as only removing them when present,
+  // but much easier...
+  core.debug('removing known labels...');
+  await Promise.all(
+    knownLabels.map(name => {
+      if (dryRun) {
+        core.debug(`DRY-RUN: would have removed "${name}"`);
+        return false;
+      }
+
+      return octokit.issues.removeLabel({
+        owner,
+        repo,
+        issue_number: pull_number,
+        name,
+      });
+    })
+  );
+
+  core.debug(`adding "${label}" label...`);
+  if (dryRun) {
+    core.debug(`DRY-RUN: would have added "${label}"`);
+  } else {
+    await octokit.issues.addLabels({
+      owner,
+      repo,
+      issue_number: pull_number,
+      labels: [label],
+    });
+  }
+}
+
 exports = module.exports = {
   getContext,
   getCommits,
   analyzeCommits,
+  labelFromAnalysis,
+  addLabel,
+  __testOnly__: {
+    requireModule,
+  },
 };

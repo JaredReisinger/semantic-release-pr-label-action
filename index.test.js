@@ -30,10 +30,11 @@ describe('action tests', () => {
       GITHUB_WORKFLOW: 'Pull Request',
       GITHUB_WORKSPACE: '.',
       // 'INPUT_GITHUB-TOKEN': 'TOKEN COMES FROM .env FILE or CI PIPELINE!',
-      'INPUT_PATCH-LABEL': 'PATCH',
-      'INPUT_MINOR-LABEL': 'MINOR',
-      'INPUT_MAJOR-LABEL': 'MAJOR',
-      'INPUT_NO-LABEL': 'NO',
+      'INPUT_PATCH-LABEL': 'release: fix',
+      'INPUT_MINOR-LABEL': 'release: feature',
+      'INPUT_MAJOR-LABEL': 'release: BREAKING',
+      'INPUT_SKIPPED-LABEL': 'release: skipped',
+      'INPUT_DRY-RUN': 'true',
     };
 
     const file = path.join(__dirname, 'index.js');
