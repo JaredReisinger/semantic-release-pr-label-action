@@ -6,10 +6,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-describe('action tests', () => {
+describe.skip('action tests', () => {
   // shows how the runner will run a javascript action with env / stdout
   // protocol
-  test('run()', async () => {
+  test.skip('run()', async () => {
     const env = {
       ...process.env,
       // set github env vars (see https://github.com/actions/toolkit/blob/master/packages/github/src/context.ts)
@@ -38,8 +38,7 @@ describe('action tests', () => {
     };
 
     const file = path.join(__dirname, 'index.js');
-    // console.log(proc.execSync(`node ${file}`, {env}).toString());
-    // const child = proc.fork(file, [], { env });
+
     const {
       // code,
       // signal,
