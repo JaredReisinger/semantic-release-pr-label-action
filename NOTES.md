@@ -1,8 +1,6 @@
 # semantic-release-pr-label-action
 
-![test status](https://github.com/JaredReisinger/semantic-release-pr-label-action/workflows/units-test/badge.svg)
-
-Labels PRs based on their semantic-release impact.
+> What follows is the boilerplate README from the template...
 
 ## Change the Code
 
