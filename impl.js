@@ -207,13 +207,6 @@ async function addLabel(
 ) {
   const knownLabels = Object.values(labels);
   core.debug(`adding label "${label}" (from ${JSON.stringify(knownLabels)})`);
-  // const result = await octokit.issues.listLabelsOnIssue({
-  //   owner,
-  //   repo,
-  //   issue_number: pull_number,
-  //   per_page: 100,
-  // });
-  // core.debug(`got labels: ${JSON.stringify(result.data.map(l => l.name))}`);
 
   // remove all the release labels, ignoring any 404 errors, and then add the
   // correct one.  (perhaps not as efficient as only removing them when present,
@@ -235,7 +228,7 @@ async function addLabel(
     })
   );
 
-  core.debug(`adding "${label}" label...`);
+  core.info(`adding "${label}" label...`);
   if (dryRun) {
     core.info(`DRY-RUN: would have added "${label}"`);
   } else {

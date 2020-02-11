@@ -41,4 +41,3 @@ jobs:
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'
           skipped-label: 'release: skipped'
-          dry-run: true
