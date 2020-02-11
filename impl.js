@@ -222,7 +222,7 @@ async function addLabel(
   await Promise.all(
     knownLabels.map(name => {
       if (dryRun) {
-        core.debug(`DRY-RUN: would have removed "${name}"`);
+        core.info(`DRY-RUN: would have removed "${name}"`);
         return false;
       }
 
@@ -237,7 +237,7 @@ async function addLabel(
 
   core.debug(`adding "${label}" label...`);
   if (dryRun) {
-    core.debug(`DRY-RUN: would have added "${label}"`);
+    core.info(`DRY-RUN: would have added "${label}"`);
   } else {
     await octokit.issues.addLabels({
       owner,
