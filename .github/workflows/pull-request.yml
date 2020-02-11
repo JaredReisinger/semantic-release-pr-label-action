@@ -36,7 +36,7 @@ jobs:
       - run: npm run package
       - uses: ./
         with:
-          github-token: BROKEN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           patch-label: 'release: fix'
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'

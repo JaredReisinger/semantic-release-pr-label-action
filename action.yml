@@ -2,7 +2,7 @@ name: Label PR Release Impact
 description: Labels a PR based on the semantic-release impact of their commits
 inputs:
   github-token:
-    description: 'token for GitHub operations, use ${{secrets.GITHUB_TOKEN}}'
+    description: 'token for GitHub operations, use secrets.GITHUB_TOKEN'
     required: true
   patch-label:
     description: label to apply for a patch release (-.-.x)
