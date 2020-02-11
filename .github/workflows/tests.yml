@@ -1,4 +1,4 @@
-name: test
+name: tests
 
 on:
   pull_request:
@@ -8,23 +8,7 @@ on:
       - 'releases/*'
 
 jobs:
-  diagnotics:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo event name: ${{ toJson(github.event_name) }}
-          echo event type: ${{ toJson(github.event.action) }}
-          echo actor: ${{ toJson(github.actor) }}
-          echo === event begin ===
-          cat <<EOF
-          ${{ toJson(github.event) }}
-          EOF
-          echo === event end ===
-          echo === env begin ===
-          env | sort
-          echo === env end ===
-
-  test:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

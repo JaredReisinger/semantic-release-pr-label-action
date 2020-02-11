@@ -1,0 +1,41 @@
+name: tests
+
+on:
+  pull_request:
+
+jobs:
+  diagnotics:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo event name: ${{ toJson(github.event_name) }}
+          echo event type: ${{ toJson(github.event.action) }}
+          echo actor: ${{ toJson(github.actor) }}
+          echo === event begin ===
+          cat <<EOF
+          ${{ toJson(github.event) }}
+          EOF
+          echo === event end ===
+          echo === env begin ===
+          env | sort
+          echo === env end ===
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci
+      - run: npm run test
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #   INPUT_GITHUB-TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- run: npm run test:coverage
+      - name: self-label
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          patch-label: 'release: fix'
+          minor-label: 'release: feature'
+          major-label: 'release: BREAKING'
+          skipped-label: 'release: skipped'
+          dry-run: true
