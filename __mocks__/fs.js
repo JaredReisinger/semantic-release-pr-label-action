@@ -60,10 +60,15 @@ function existsSync(file) {
   return fsActual.existsSync(file);
 }
 
+function readFileSync(file) {
+  return fsActual.readFileSync(file);
+}
+
 module.exports = {
   promises: {
     readdir,
   },
   existsSync,
+  readFileSync,
   __setMockedFiles,
 };
