@@ -1,6 +1,7 @@
 // mock fs module...
 // const path = require('path');
-const path = jest.requireActual('path');
+const pathActual = jest.requireActual('path');
+const fsActual = jest.requireActual('fs');
 
 // mockedFiles is a map of files (as a Set?) for a given directory path
 let mockedFiles = {};
@@ -21,7 +22,7 @@ function __setMockedFiles(files) {
       mockedFiles[key] = (mockedFiles[key] || new Set()).add(value);
     }
 
-    let parts = path.parse(key);
+    let parts = pathActual.parse(key);
     // We expect all files to be "fake-rooted" to 'ROOT', without '/'
     expect(parts.root).toBe('');
 
@@ -31,7 +32,7 @@ function __setMockedFiles(files) {
       mockedFiles[parts.dir] = (mockedFiles[parts.dir] || new Set()).add(
         parts.base
       );
-      parts = path.parse(parts.dir);
+      parts = pathActual.parse(parts.dir);
     }
   });
 
@@ -52,9 +53,17 @@ async function readdir(dir, options) {
   return [...fileSet];
 }
 
+// Somehow the @actions/github initialization is sometimes hitting this...
+// perhaps Jest's genMockFromModule() is causing it?  For now, we allow this
+// to pass through unscathed.
+function existsSync(file) {
+  return fsActual.existsSync(file);
+}
+
 module.exports = {
   promises: {
     readdir,
   },
+  existsSync,
   __setMockedFiles,
 };
