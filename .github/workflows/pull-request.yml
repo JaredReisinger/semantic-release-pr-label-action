@@ -34,10 +34,16 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm ci
       - run: npm run package
-      - uses: ./
+      - name: perform action
+        id: sr
+        uses: ./
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           patch-label: 'release: fix'
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'
           skipped-label: 'release: skipped'
+      - run: |
+          echo CHECKING OUTPUTS...
+          echo "  semantic-release-result: ${{ steps.sr.outputs.semantic-release-result }}"
+          echo "  label: ${{ steps.sr.outputs.label }}"
