@@ -15,7 +15,16 @@ async function run() {
     // console.dir({ commits });
     const result = await impl.analyzeCommits(commits, context);
     // core.debug(`result: ${JSON.stringify(result)}`);
+    // output the analysis result:
+    core.info(
+      `setting "semantic-release-result" output to "${result || 'skipped'}"`
+    );
+    core.setOutput('semantic-release-result', result || 'skipped');
+
     const label = impl.labelFromAnalysis(result, context);
+    core.info(`setting "label" output to "${label}"`);
+    core.setOutput('label', label);
+
     await impl.addLabel(label, context);
   } catch (error) {
     core.setFailed(error.message);
