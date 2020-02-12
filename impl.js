@@ -207,37 +207,38 @@ async function addLabel(
 ) {
   const knownLabels = Object.values(labels);
   core.debug(`adding label "${label}" (from ${JSON.stringify(knownLabels)})`);
-  // const result = await octokit.issues.listLabelsOnIssue({
-  //   owner,
-  //   repo,
-  //   issue_number: pull_number,
-  //   per_page: 100,
-  // });
-  // core.debug(`got labels: ${JSON.stringify(result.data.map(l => l.name))}`);
 
   // remove all the release labels, ignoring any 404 errors, and then add the
   // correct one.  (perhaps not as efficient as only removing them when present,
   // but much easier...
   core.debug('removing known labels...');
   await Promise.all(
-    knownLabels.map(name => {
+    knownLabels.map(async name => {
       if (dryRun) {
-        core.debug(`DRY-RUN: would have removed "${name}"`);
+        core.info(`DRY-RUN: would have removed "${name}"`);
         return false;
       }
 
-      return octokit.issues.removeLabel({
-        owner,
-        repo,
-        issue_number: pull_number,
-        name,
-      });
+      // we don't care about failures here!
+      try {
+        await octokit.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: pull_number,
+          name,
+        });
+        core.debug(`removed label "${name}"`);
+        return true;
+      } catch (error) {
+        core.debug(`ignoring error "${error.message}" for "${name}"`);
+        return false;
+      }
     })
   );
 
-  core.debug(`adding "${label}" label...`);
+  core.info(`adding "${label}" label...`);
   if (dryRun) {
-    core.debug(`DRY-RUN: would have added "${label}"`);
+    core.info(`DRY-RUN: would have added "${label}"`);
   } else {
     await octokit.issues.addLabels({
       owner,

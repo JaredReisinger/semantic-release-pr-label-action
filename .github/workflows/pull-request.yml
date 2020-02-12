@@ -1,4 +1,4 @@
-name: tests
+name: pull-request
 
 on:
   pull_request:
@@ -26,16 +26,18 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm ci
       - run: npm run test
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   INPUT_GITHUB-TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #- run: npm run test:coverage
-      - name: self-label
-        uses: ./
+
+  self-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci
+      - run: npm run package
+      - uses: ./
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           patch-label: 'release: fix'
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'
           skipped-label: 'release: skipped'
-          dry-run: true
