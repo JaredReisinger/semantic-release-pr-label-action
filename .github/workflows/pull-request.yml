@@ -49,5 +49,5 @@ jobs:
 
       - name: Check outputs
         run: |
-          echo "  semantic-release-result: ${{ steps.sr.outputs.semantic-release-result }}"
-          echo "  label: ${{ steps.sr.outputs.label }}"
+          echo "semantic-release-result: ${{ steps.sr.outputs.semantic-release-result }}"
+          echo "label: ${{ steps.sr.outputs.label }}"

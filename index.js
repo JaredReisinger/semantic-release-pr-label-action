@@ -14,12 +14,11 @@ async function run() {
     // core.debug(JSON.stringify(commits));
     // console.dir({ commits });
     const result = await impl.analyzeCommits(commits, context);
+    const resultOutput = result || 'no-release';
     // core.debug(`result: ${JSON.stringify(result)}`);
     // output the analysis result:
-    core.info(
-      `setting "semantic-release-result" output to "${result || 'skipped'}"`
-    );
-    core.setOutput('semantic-release-result', result || 'skipped');
+    core.info(`setting "semantic-release-result" output to "${resultOutput}"`);
+    core.setOutput('semantic-release-result', resultOutput);
 
     const label = impl.labelFromAnalysis(result, context);
     core.info(`setting "label" output to "${label}"`);
