@@ -32,12 +32,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - run: npm ci
+
       - run: npm run package
-      - uses: ./
+
+      - name: Run semantic-release-pr-label-action locally
+        id: sr
+        uses: ./
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           patch-label: 'release: fix'
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'
           skipped-label: 'release: skipped'
+
+      - name: Check outputs
+        run: |
+          echo "semantic-release-result: ${{ steps.sr.outputs.semantic-release-result }}"
+          echo "label: ${{ steps.sr.outputs.label }}"
