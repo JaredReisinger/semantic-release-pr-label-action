@@ -213,18 +213,26 @@ async function addLabel(
   // but much easier...
   core.debug('removing known labels...');
   await Promise.all(
-    knownLabels.map(name => {
+    knownLabels.map(async name => {
       if (dryRun) {
         core.info(`DRY-RUN: would have removed "${name}"`);
         return false;
       }
 
-      return octokit.issues.removeLabel({
-        owner,
-        repo,
-        issue_number: pull_number,
-        name,
-      });
+      // we don't care about failures here!
+      try {
+        await octokit.issues.removeLabel({
+          owner,
+          repo,
+          issue_number: pull_number,
+          name,
+        });
+        core.debug(`removed label "${name}"`);
+        return true;
+      } catch (error) {
+        core.debug(`ignoring error "${error.message}" for "${name}"`);
+        return false;
+      }
     })
   );
 
