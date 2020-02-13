@@ -240,12 +240,16 @@ async function addLabel(
   if (dryRun) {
     core.info(`DRY-RUN: would have added "${label}"`);
   } else {
-    await octokit.issues.addLabels({
-      owner,
-      repo,
-      issue_number: pull_number,
-      labels: [label],
-    });
+    try {
+      await octokit.issues.addLabels({
+        owner,
+        repo,
+        issue_number: pull_number,
+        labels: [label],
+      });
+    } catch (error) {
+      core.info(`got error "${error.message}" attempting to set label`);
+    }
   }
 }
 
