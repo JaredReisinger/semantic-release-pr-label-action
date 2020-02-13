@@ -249,6 +249,13 @@ async function addLabel(
       });
     } catch (error) {
       core.info(`got error "${error.message}" attempting to set label`);
+      // try creating a comment instead?
+      await octokit.issues.createComment({
+        owner,
+        repo,
+        issue_number: pull_number,
+        body: `semantic-release impact: ${label}`,
+      });
     }
   }
 }
