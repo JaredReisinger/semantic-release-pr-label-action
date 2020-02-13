@@ -41,7 +41,8 @@ jobs:
         id: sr
         uses: ./
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          #github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.READ_ONLY_TOKEN }}
           patch-label: 'release: fix'
           minor-label: 'release: feature'
           major-label: 'release: BREAKING'
